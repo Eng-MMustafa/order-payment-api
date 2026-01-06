@@ -1,0 +1,577 @@
+{
+  "info": {
+    "_postman_id": "b3c2c7f0-3d9f-4a5e-9f6a-67e2a0d6d3a1",
+    "name": "Order-Payment API (Extended)",
+    "description": "Comprehensive collection with success and error examples for Authentication, Orders, and Payments",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "JWT authentication endpoints with success and error examples",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/auth/register", "host": ["{{base_url}}"], "path": ["api","auth","register"] },
+            "description": "Register a new user"
+          }
+        ,
+        "response": [
+          {
+            "name": "201 Created",
+            "originalRequest": { "method": "POST", "url": "{{base_url}}/api/auth/register" },
+            "status": "Created",
+            "code": 201,
+            "body": "{\n  \"success\": true,\n  \"access_token\": \"<token>\",\n  \"token_type\": \"bearer\",\n  \"expires_in\": 3600,\n  \"user\": {\"id\":1,\"name\":\"Test User\",\"email\":\"test@example.com\"}\n}"
+          }
+        ]
+        },
+        {
+          "name": "Register - Validation Error (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Bad User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}" },
+            "url": { "raw": "{{base_url}}/api/auth/register", "host": ["{{base_url}}"], "path": ["api","auth","register"] },
+            "description": "Missing password_confirmation or duplicate email"
+          }
+        ,
+        "response": [
+          {
+            "name": "422 Validation Error",
+            "originalRequest": { "method": "POST", "url": "{{base_url}}/api/auth/register" },
+            "status": "Unprocessable Entity",
+            "code": 422,
+            "body": "{\n  \"success\": false,\n  \"message\": \"Validation error\",\n  \"errors\": {\"password\": [\"The password confirmation does not match.\"]}\n}"
+          }
+        ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}" },
+            "url": { "raw": "{{base_url}}/api/auth/login", "host": ["{{base_url}}"], "path": ["api","auth","login"] },
+            "description": "Login to receive JWT token"
+          }
+        ,
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "POST", "url": "{{base_url}}/api/auth/login" },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"success\": true,\n  \"access_token\": \"<token>\",\n  \"token_type\": \"bearer\",\n  \"expires_in\": 3600,\n  \"user\": {\"id\":1,\"name\":\"Test User\",\"email\":\"test@example.com\"}\n}"
+          }
+        ]
+        },
+        {
+          "name": "Login - Unauthorized (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"wrongpassword\"\n}" },
+            "url": { "raw": "{{base_url}}/api/auth/login", "host": ["{{base_url}}"], "path": ["api","auth","login"] },
+            "description": "Invalid credentials example"
+          }
+        ,
+        "response": [
+          {
+            "name": "401 Unauthorized",
+            "originalRequest": { "method": "POST", "url": "{{base_url}}/api/auth/login" },
+            "status": "Unauthorized",
+            "code": 401,
+            "body": "{\n  \"success\": false,\n  \"message\": \"Unauthorized. Invalid email or password.\"\n}"
+          }
+        ]
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/api/auth/me", "host": ["{{base_url}}"], "path": ["api","auth","me"] },
+            "description": "Get authenticated user"
+          }
+        ,
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "GET", "url": "{{base_url}}/api/auth/me" },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"id\": 1,\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\"\n}"
+          }
+        ]
+        },
+        {
+          "name": "Me - Unauthorized (401)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/api/auth/me", "host": ["{{base_url}}"], "path": ["api","auth","me"] },
+            "description": "Missing Bearer token"
+          }
+        ,
+        "response": [
+          {
+            "name": "401 Unauthenticated",
+            "originalRequest": { "method": "GET", "url": "{{base_url}}/api/auth/me" },
+            "status": "Unauthorized",
+            "code": 401,
+            "body": "{\n  \"message\": \"Unauthenticated.\"\n}"
+          }
+        ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/api/auth/logout", "host": ["{{base_url}}"], "path": ["api","auth","logout"] },
+            "description": "Invalidate token"
+          }
+        ,
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "POST", "url": "{{base_url}}/api/auth/logout" },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"success\": true,\n  \"message\": \"Successfully logged out\"\n}"
+          }
+        ]
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "description": "Order endpoints with success and error examples",
+      "item": [
+        {
+          "name": "List Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/orders?status=pending&per_page=10",
+              "host": ["{{base_url}}"],
+              "path": ["api","orders"],
+              "query": [
+                { "key": "status", "value": "pending" },
+                { "key": "per_page", "value": "10" }
+              ]
+            },
+            "description": "List with status filter and pagination"
+          }
+        },
+        {
+          "name": "List Orders - Unauthorized (401)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/api/orders", "host": ["{{base_url}}"], "path": ["api","orders"] },
+            "description": "Missing Bearer token"
+          }
+        },
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shipping_address\": \"123 Shipping Street\",\n  \"billing_address\": \"123 Billing Street\",\n  \"items\": [\n    {\"product_name\": \"Product 1\", \"quantity\": 2, \"unit_price\": 99.99},\n    {\"product_name\": \"Product 2\", \"quantity\": 1, \"unit_price\": 49.99}\n  ],\n  \"notes\": \"Deliver during business hours\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/orders", "host": ["{{base_url}}"], "path": ["api","orders"] },
+            "description": "Create pending order with items"
+          }
+        ,
+        "response": [
+          {
+            "name": "201 Created",
+            "originalRequest": { "method": "POST", "url": "{{base_url}}/api/orders" },
+            "status": "Created",
+            "code": 201,
+            "body": "{\n  \"success\": true,\n  \"message\": \"Order created successfully\",\n  \"data\": {\"id\":1,\"status\":\"pending\",\"total_amount\":249.97}\n}"
+          }
+        ]
+        },
+        {
+          "name": "Create Order - Validation Error (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"shipping_address\": \"\",\n  \"billing_address\": \"\",\n  \"items\": []\n}" },
+            "url": { "raw": "{{base_url}}/api/orders", "host": ["{{base_url}}"], "path": ["api","orders"] },
+            "description": "Invalid payload"
+          }
+        ,
+        "response": [
+          {
+            "name": "422 Validation Error",
+            "originalRequest": { "method": "POST", "url": "{{base_url}}/api/orders" },
+            "status": "Unprocessable Entity",
+            "code": 422,
+            "body": "{\n  \"success\": false,\n  \"message\": \"Validation error\",\n  \"errors\": {\"items\": [\"The items field must have at least 1 items.\"]}\n}"
+          }
+        ]
+        },
+        {
+          "name": "Get Order Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/api/orders/1", "host": ["{{base_url}}"], "path": ["api","orders","1"] },
+            "description": "Fetch order by ID with items and payments"
+          }
+        ,
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "GET", "url": "{{base_url}}/api/orders/1" },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"success\": true,\n  \"data\": {\"id\":1,\"orderItems\":[],\"payments\":[]}\n}"
+          }
+        ]
+        },
+        {
+          "name": "Get Order Details - Not Found (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/api/orders/999999", "host": ["{{base_url}}"], "path": ["api","orders","999999"] },
+            "description": "Non-existent order ID"
+          }
+        ,
+        "response": [
+          {
+            "name": "404 Not Found",
+            "originalRequest": { "method": "GET", "url": "{{base_url}}/api/orders/999999" },
+            "status": "Not Found",
+            "code": 404,
+            "body": "{\n  \"success\": false,\n  \"message\": \"Order not found\"\n}"
+          }
+        ]
+        },
+        {
+          "name": "Update Order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"shipping_address\": \"Updated Shipping\",\n  \"status\": \"confirmed\",\n  \"notes\": \"Updated notes\"\n}" },
+            "url": { "raw": "{{base_url}}/api/orders/1", "host": ["{{base_url}}"], "path": ["api","orders","1"] },
+            "description": "Update pending order"
+          }
+        ,
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "PUT", "url": "{{base_url}}/api/orders/1" },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"success\": true,\n  \"message\": \"Order updated successfully\",\n  \"data\": {\"id\":1,\"status\":\"confirmed\"}\n}"
+          }
+        ]
+        },
+        {
+          "name": "Update Order - Validation Error (422)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"invalid_status\"\n}" },
+            "url": { "raw": "{{base_url}}/api/orders/1", "host": ["{{base_url}}"], "path": ["api","orders","1"] },
+            "description": "Invalid status"
+          }
+        ,
+        "response": [
+          {
+            "name": "422 Validation Error",
+            "originalRequest": { "method": "PUT", "url": "{{base_url}}/api/orders/1" },
+            "status": "Unprocessable Entity",
+            "code": 422,
+            "body": "{\n  \"success\": false,\n  \"message\": \"Validation error\",\n  \"errors\": {\"status\": [\"The selected status is invalid.\"]}\n}"
+          }
+        ]
+        },
+        {
+          "name": "Delete Order",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/api/orders/1", "host": ["{{base_url}}"], "path": ["api","orders","1"] },
+            "description": "Delete order without payments"
+          }
+        ,
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "DELETE", "url": "{{base_url}}/api/orders/1" },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"success\": true,\n  \"message\": \"Order deleted successfully\"\n}"
+          }
+        ]
+        },
+        {
+          "name": "Delete Order - Not Found (404)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/api/orders/999999", "host": ["{{base_url}}"], "path": ["api","orders","999999"] },
+            "description": "Deleting non-existent order"
+          }
+        ,
+        "response": [
+          {
+            "name": "404 Not Found",
+            "originalRequest": { "method": "DELETE", "url": "{{base_url}}/api/orders/999999" },
+            "status": "Not Found",
+            "code": 404,
+            "body": "{\n  \"success\": false,\n  \"message\": \"Order not found\"\n}"
+          }
+        ]
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "description": "Payment endpoints with success and error examples",
+      "item": [
+        {
+          "name": "Process Payment (Credit Card)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": 1,\n  \"payment_method\": \"credit_card\",\n  \"card_number\": \"4242424242424242\",\n  \"card_expiry_month\": \"12\",\n  \"card_expiry_year\": \"2025\",\n  \"card_cvv\": \"123\"\n}" },
+            "url": { "raw": "{{base_url}}/api/payments/process", "host": ["{{base_url}}"], "path": ["api","payments","process"] },
+            "description": "Order must be confirmed"
+          }
+        ,
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "POST", "url": "{{base_url}}/api/payments/process" },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"success\": true,\n  \"message\": \"Payment processed successfully\",\n  \"data\": {\"id\":1,\"status\":\"successful\",\"payment_method\":\"credit_card\"}\n}"
+          }
+        ]
+        },
+        {
+          "name": "Process Payment - Validation Error (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": 1,\n  \"payment_method\": \"credit_card\"\n}" },
+            "url": { "raw": "{{base_url}}/api/payments/process", "host": ["{{base_url}}"], "path": ["api","payments","process"] },
+            "description": "Missing method-specific fields"
+          }
+        ,
+        "response": [
+          {
+            "name": "422 Validation Error",
+            "originalRequest": { "method": "POST", "url": "{{base_url}}/api/payments/process" },
+            "status": "Unprocessable Entity",
+            "code": 422,
+            "body": "{\n  \"success\": false,\n  \"message\": \"Validation error\",\n  \"errors\": {\"card_number\": [\"The card number field is required when payment method is credit card.\"]}\n}"
+          }
+        ]
+        },
+        {
+          "name": "Process Payment - Not Allowed (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": 1,\n  \"payment_method\": \"paypal\",\n  \"paypal_email\": \"buyer@example.com\"\n}" },
+            "url": { "raw": "{{base_url}}/api/payments/process", "host": ["{{base_url}}"], "path": ["api","payments","process"] },
+            "description": "Order not confirmed"
+          }
+        ,
+        "response": [
+          {
+            "name": "422 Rule Violation",
+            "originalRequest": { "method": "POST", "url": "{{base_url}}/api/payments/process" },
+            "status": "Unprocessable Entity",
+            "code": 422,
+            "body": "{\n  \"success\": false,\n  \"message\": \"This order cannot be processed for payment. Order status must be confirmed.\"\n}"
+          }
+        ]
+        },
+        {
+          "name": "List Payments",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/payments?order_id=1&per_page=10",
+              "host": ["{{base_url}}"],
+              "path": ["api","payments"],
+              "query": [
+                { "key": "order_id", "value": "1" },
+                { "key": "per_page", "value": "10" }
+              ]
+            },
+            "description": "Filter by order ID"
+          }
+        ,
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "GET", "url": "{{base_url}}/api/payments?order_id=1&per_page=10" },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"success\": true,\n  \"data\": {\"data\": [], \"current_page\": 1}\n}"
+          }
+        ]
+        },
+        {
+          "name": "List Payments - Unauthorized (401)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/api/payments", "host": ["{{base_url}}"], "path": ["api","payments"] },
+            "description": "Missing Bearer token"
+          }
+        ,
+        "response": [
+          {
+            "name": "401 Unauthenticated",
+            "originalRequest": { "method": "GET", "url": "{{base_url}}/api/payments" },
+            "status": "Unauthorized",
+            "code": 401,
+            "body": "{\n  \"message\": \"Unauthenticated.\"\n}"
+          }
+        ]
+        },
+        {
+          "name": "Get Payment Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/api/payments/1", "host": ["{{base_url}}"], "path": ["api","payments","1"] },
+            "description": "Includes gateway status"
+          }
+        ,
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "GET", "url": "{{base_url}}/api/payments/1" },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"success\": true,\n  \"data\": {\"id\":1,\"status\":\"successful\"},\n  \"gateway_status\": {\"status\":\"successful\"}\n}"
+          }
+        ]
+        },
+        {
+          "name": "Get Payment Details - Not Found (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/api/payments/999999", "host": ["{{base_url}}"], "path": ["api","payments","999999"] },
+            "description": "Non-existent payment ID"
+          }
+        ,
+        "response": [
+          {
+            "name": "404 Not Found",
+            "originalRequest": { "method": "GET", "url": "{{base_url}}/api/payments/999999" },
+            "status": "Not Found",
+            "code": 404,
+            "body": "{\n  \"success\": false,\n  \"message\": \"Payment not found\"\n}"
+          }
+        ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000", "type": "string" },
+    { "key": "token", "value": "your_jwt_token_here", "type": "string" }
+  ]
+}
